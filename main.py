@@ -1,8 +1,9 @@
 import argparse
 
+import numpy as np
+
 from src.scanner.scanner import SudokuScanner
 from src.solver.plp_solver import SudokuSolver
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Perform Sudoku solving!!!')
@@ -13,6 +14,8 @@ if __name__ == '__main__':
     sudoku_solver = SudokuSolver()
 
     board = sudoku_scanner.scan_board(args.input_file_path)
+    print('Detected board: ')
+    print(board)
 
     result = sudoku_solver.solve(board)
 
