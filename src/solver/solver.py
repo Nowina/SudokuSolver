@@ -19,10 +19,14 @@ class SudokuSolver():
         # setting dummy objective
         self._problem.setObjective(plp.lpSum(0))
 
-        self.add_constraints(self._problem)
+        self.add_constraints()
     
+    def solve(self, input_values: np.ndarray) -> np.ndarray:
+        problem_new = self.add_initial__values(input_values)
 
-    def add_initial__values(self, input_values: np.ndarray, problem: plp.LpProblem) -> None:
+        return problem_new.solve()
+    
+    def add_initial__values(self, input_values: np.ndarray) -> plp.LpProblem:
         """Add initial values from input
 
         Args:
@@ -31,7 +35,12 @@ class SudokuSolver():
 
         Raises:
             TypeError: Input_values shape not equal (9,9)
+
+        Returns:
+            plp.LpProblem: problem with constraints representing input values
         """
+
+        problem = self._problem.copy()
 
         if input_values.shape != (9,9):
             raise TypeError('input_values array has to be in shape (9,9)')
@@ -46,8 +55,9 @@ class SudokuSolver():
                         rhs=input_values[row][col],
                         name=f"constraint_input_{row}_{col}"))
         
-
-    def add_constraints(self, problem: plp.LpProblem) -> None:
+        return problem
+        
+    def add_constraints(self) -> None:
         """Add constraints defining sudoku
 
         Args:
@@ -56,7 +66,7 @@ class SudokuSolver():
         # Add constraint to make cell hold only one value
         for row in self._rows:
             for col in self._cols:
-                problem.addConstraint(plp.LpConstraint(
+                self._problem.addConstraint(plp.LpConstraint(
                     e=plp.lpSum([self._sudoku_variables[row][col][value]
                                  for value in self._values]),
                     sense=plp.LpConstraintEQ,
@@ -67,7 +77,7 @@ class SudokuSolver():
         # Add constraint making _values from 1-9 to appear once in row      
         for row in self._rows:
             for value in self._values:
-                problem.addConstraint(plp.LpConstraint(
+                self._problem.addConstraint(plp.LpConstraint(
                     e=plp.lpSum([self._sudoku_variables[row][col][value]
                                 * value for col in self._cols]),
                     sense=plp.LpConstraintEQ,
@@ -77,7 +87,7 @@ class SudokuSolver():
         # Add constraint making _values from 1-9 to appear once in column       
         for col in self._cols:
             for value in self._values:
-                problem.addConstraint(plp.LpConstraint(
+                self._problem.addConstraint(plp.LpConstraint(
                     e=plp.lpSum([self._sudoku_variables[row][col][value]
                                 * value for row in self._rows]),
                     sense=plp.LpConstraintEQ,
@@ -91,10 +101,9 @@ class SudokuSolver():
             grid_col  = int(grid%3)
 
             for value in self._values:
-                problem.addConstraint(plp.LpConstraint(
+                self._problem.addConstraint(plp.LpConstraint(
                     e=plp.lpSum([self._sudoku_variables[grid_row*3+row][grid_col*3+col][value]
                                 * value for col in range(0, 3) for row in range(0, 3)]),
                     sense=plp.LpConstraintEQ,
                     rhs=value,
                     name=f"constraint_unique_grid_{grid}_{value}"))
-
