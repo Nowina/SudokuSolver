@@ -3,13 +3,7 @@ import pulp as plp
 
 
 class SudokuSolver():
-    # defining target value ranges in cells
-    _rows = range(0,9)
-    _cols = range(0,9)
-    _values = range(1,10)
-    _grids = range(0,9) # range of 3x3 sub_grids
-
-    _sudoku_variables = plp.LpVariable('grid_value', (_rows, _cols, _values), cat= plp.const.LpBinary)
+    
 
     def __init__(self) -> None:
         """Initialise solver with typical sudoku constraints"""
@@ -18,13 +12,22 @@ class SudokuSolver():
 
         # setting dummy objective
         self._problem.setObjective(plp.lpSum(0))
+        # defining target value ranges in cells
+        self._rows = range(0,9)
+        self._cols = range(0,9)
+        self._values = range(1,10)
+        self._grids = range(0,9) # range of 3x3 sub_grids
+
+        self._sudoku_variables = plp.LpVariable.dicts(
+            'grid_value', (self._rows, self._cols, self._values),
+            cat=plp.const.LpBinary)
 
         self.add_constraints()
     
     def solve(self, input_values: np.ndarray) -> np.ndarray:
         problem_new = self.add_initial__values(input_values)
 
-        return problem_new.solve()
+        return self.solution_to_numpy(problem_new.solve())
     
     def add_initial__values(self, input_values: np.ndarray) -> plp.LpProblem:
         """Add initial values from input
@@ -97,8 +100,8 @@ class SudokuSolver():
 
         # Add constraint making _values from 1-9 to appear once in a 3x3 subgrid
         for grid in self._grids:
-            grid_row  = int(grid/3)
-            grid_col  = int(grid%3)
+            grid_row = int(grid / 3)
+            grid_col = int(grid % 3)
 
             for value in self._values:
                 self._problem.addConstraint(plp.LpConstraint(
@@ -107,3 +110,12 @@ class SudokuSolver():
                     sense=plp.LpConstraintEQ,
                     rhs=value,
                     name=f"constraint_unique_grid_{grid}_{value}"))
+
+    def solution_to_numpy(self, solution) -> np.ndarray:
+        solution = [[0 for col in self._cols] for row in self._rows]
+        for row in self._rows:
+            for col in self._cols:
+                for value in self._values:
+                    if plp.value(self._sudoku_variables[row][col][value]):
+                        solution[row][col] = value 
+        return np.array(solution)
