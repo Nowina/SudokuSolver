@@ -1,2 +1,2 @@
 # Sudoku Solver
-### *by Jan Nowiński, for IPS Project at Mechatronics Faculty, WuT*
+#### *by Jan Nowiński, for IPS Project at Mechatronics Faculty, WuT*
