@@ -29,7 +29,7 @@ class SudokuScanner():
         if not os.path.exists(image_path):
             raise FileNotFoundError(f'{image_path} not found!!!')
 
-        image = cv2.imread('./data/sudoku_2.jpeg')
+        image = cv2.imread(image_path)
 
         if image is None:
             raise TypeError(f'{image_path} is not valid image file')
@@ -65,7 +65,7 @@ class SudokuScanner():
         return board
 
 
-    def _find_board(image):
+    def _find_board(self, image):
         """Find and return Sudoku Board on image, removing perspective
 
         Args:
@@ -111,7 +111,7 @@ class SudokuScanner():
         
         return sudoku_warped, sudoku_warped_thresh
     
-    def _pred_number(image) -> str:
+    def _pred_number(self, image) -> str:
         """Predict number in cell using Tesseract
 
         Args:
