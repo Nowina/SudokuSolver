@@ -26,8 +26,13 @@ class SudokuSolver():
     
     def solve(self, input_values: np.ndarray) -> np.ndarray:
         problem_new = self.add_initial__values(input_values)
+        problem_new.solve()
+        solution_status = plp.LpStatus[problem_new.status]
+        print(f'Solution Status = {plp.LpStatus[problem_new.status]}')
 
-        return self.solution_to_numpy(problem_new.solve())
+        # Extract the solution if an optimal solution has been identified
+        if solution_status == 'Optimal':
+            return self.solution_to_numpy(problem_new.solve())
     
     def add_initial__values(self, input_values: np.ndarray) -> plp.LpProblem:
         """Add initial values from input
