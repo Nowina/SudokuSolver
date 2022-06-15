@@ -14,6 +14,18 @@ class SudokuScanner():
         pytesseract.pytesseract.tesseract_cmd = tesseract_path
     
     def scan_board(self, image_path: str) -> np.ndarray:
+        """Scan Sudoku board from file to numpy array
+
+        Args:
+            image_path (str): path to the image
+
+        Raises:
+            FileNotFoundError
+            TypeError: if img file is not readable
+
+        Returns:
+            np.ndarray: scanned board
+        """
         if not os.path.exists(image_path):
             raise FileNotFoundError(f'{image_path} not found!!!')
 
