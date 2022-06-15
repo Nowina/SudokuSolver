@@ -26,19 +26,19 @@ class SudokuSolver():
             'grid_value', (self._rows, self._cols, self._values),
             cat=plp.const.LpBinary)
 
-        self.add_constraints()
+        self._add_constraints()
     
     def solve(self, input_values: np.ndarray) -> np.ndarray:
-        problem_new = self.add_initial__values(input_values)
+        problem_new = self._add_initial__values(input_values)
         problem_new.solve()
 
         solution_status = plp.LpStatus[problem_new.status]
         if solution_status == 'Optimal':
-            return self.solution_to_numpy(problem_new.solve())
+            return self._solution_to_numpy(problem_new.solve())
         else:
             raise TypeError('Provided input matrix does not have a solution!!!')
     
-    def add_initial__values(self, input_values: np.ndarray) -> plp.LpProblem:
+    def _add_initial__values(self, input_values: np.ndarray) -> plp.LpProblem:
         """Add initial values from input
 
         Args:
@@ -69,7 +69,7 @@ class SudokuSolver():
         
         return problem
         
-    def add_constraints(self) -> None:
+    def _add_constraints(self) -> None:
         """Add constraints defining sudoku
 
         Args:
@@ -121,7 +121,7 @@ class SudokuSolver():
                     rhs=value,
                     name=f"constraint_unique_grid_{grid}_{value}"))
 
-    def solution_to_numpy(self, solution) -> np.ndarray:
+    def _solution_to_numpy(self, solution) -> np.ndarray:
         """Convert solution to numpy array
 
         Args:
